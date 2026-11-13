@@ -1,5 +1,7 @@
 import http from 'node:http';
 import {readFile} from 'node:fs/promises';
-const files={'/':'index.html','/index.html':'index.html','/styles.css':'styles.css','/premium.css':'premium.css','/assets/azure-pro.png':'assets/azure-pro.png','/app.js':'app.js'};
-const types={html:'text/html; charset=utf-8',css:'text/css; charset=utf-8',js:'text/javascript; charset=utf-8',png:'image/png'};
-http.createServer(async(req,res)=>{const path=new URL(req.url,'http://localhost').pathname;const file=files[path];if(!file){res.writeHead(404);res.end('Not found');return;}try{const data=await readFile(new URL('./dist/'+file,import.meta.url));res.writeHead(200,{'Content-Type':types[file.split('.').pop()]});res.end(data);}catch{res.writeHead(500);res.end('Unable to load preview');}}).listen(4173,'127.0.0.1',()=>console.log('Azure preview: http://127.0.0.1:4173'));
+import path from 'node:path';
+import {fileURLToPath} from 'node:url';
+const root=fileURLToPath(new URL('./dist/',import.meta.url));
+const types={html:'text/html; charset=utf-8',css:'text/css; charset=utf-8',js:'text/javascript; charset=utf-8',png:'image/png',jpg:'image/jpeg',webp:'image/webp',svg:'image/svg+xml'};
+http.createServer(async(req,res)=>{try{const pathname=decodeURIComponent(new URL(req.url,'http://localhost').pathname);const file=path.resolve(root,'.'+(pathname==='/'?'/index.html':pathname));if(!file.startsWith(root)){res.writeHead(403);res.end();return;}const data=await readFile(file);res.writeHead(200,{'Content-Type':types[path.extname(file).slice(1)]||'application/octet-stream'});res.end(data);}catch{res.writeHead(404);res.end('Not found');}}).listen(4173,'127.0.0.1',()=>console.log('Azure preview: http://127.0.0.1:4173'));
