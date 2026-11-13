@@ -1,24 +1,18 @@
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { ScrollSmoother } from 'gsap/ScrollSmoother';
+import { SplitText } from 'gsap/SplitText';
+import { Flip } from 'gsap/Flip';
 import { useGSAP } from '@gsap/react';
 
-// Register GSAP plugins
-gsap.registerPlugin(ScrollTrigger, useGSAP);
-
-// Configure ScrollTrigger defaults to prevent resize thrashing on mobile browsers
+// The plugins touch `document` while registering, so they are skipped during
+// server-side rendering (the unit tests render the app in Node).
 if (typeof window !== 'undefined') {
-  ScrollTrigger.config({
-    ignoreMobileResize: true,
-    limitCallbacks: true,
-    autoRefreshEvents: 'visibilitychange,DOMContentLoaded,load,resize',
-  });
+  gsap.registerPlugin(ScrollTrigger, ScrollSmoother, SplitText, Flip, useGSAP);
 
-  // Ensure scroll trigger refreshes once web fonts are fully loaded
-  if ('fonts' in document) {
-    document.fonts.ready.then(() => {
-      ScrollTrigger.refresh();
-    });
-  }
+  // Mobile browsers resize the viewport as the address bar hides; ignore that
+  // so pinned chapters do not jump.
+  ScrollTrigger.config({ ignoreMobileResize: true });
 }
 
-export { gsap, ScrollTrigger, useGSAP };
+export { gsap, ScrollTrigger, ScrollSmoother, SplitText, Flip, useGSAP };

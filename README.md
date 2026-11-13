@@ -6,10 +6,15 @@ The active interface is `src/App.tsx`, visual styles are `src/premium.css`, and 
 four accessories are defined in `src/data/collection.ts`. Product details, phone filters, comparison,
 and browser-local saved selections are implemented. The previous shortlist key is preserved.
 
-The design follows the approved navy-and-ivory mockup: an image-led hero, five-column phone grid
-(two columns on phones), scroll-linked text and camera detail, four accessories, comparison and closing band.
-Native scrolling is retained; one requestAnimationFrame updates the story, and reduced-motion preferences
-show the final text without transforms. Product images load lazily below the hero.
+The interface is a deep-navy, titanium and ivory design in Bricolage Grotesque: a GSAP loader curtain,
+an image-led hero, a word-by-word statement, a pinned "craft" chapter that travels across one macro
+photograph, a five-column phone grid (two columns on phones), four accessories, comparison and a closing band.
+
+Motion lives in `src/hooks/useAzureMotion.ts` (GSAP: ScrollSmoother, ScrollTrigger, SplitText, Flip; plugins
+are registered in `src/lib/gsap.ts`). Everything is skipped under `prefers-reduced-motion`: no loader, native
+scrolling, and every section renders in its final state. Touch devices keep native scrolling. Product images
+load lazily below the hero. The page uses its own small CSS reset (the project has no PostCSS config, so the
+Tailwind directives in `src/index.css` do not generate anything).
 
 Concept imagery was generated specifically for the approved design. It is disclosed as concept artwork;
 no real specifications, compatibility, inventory or checkout are claimed. See `docs/approved-design-assets.md`.
