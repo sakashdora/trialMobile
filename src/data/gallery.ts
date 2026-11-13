@@ -1,0 +1,72 @@
+import { GalleryScene, GalleryPhoto } from '../types/gallery';
+
+export const galleryScenes: GalleryScene[] = [
+  {
+    id: 'night',
+    index: 0,
+    image: '/assets/images/gallery/gallery-night.jpg',
+    alt: 'Starry sky reflected in a mountain lake in Jasper, Canada',
+    kicker: '01 / AFTER HOURS',
+    title: 'Low-Light Astro Photography',
+    credit: 'Priscilla Du Preez',
+    url: 'https://unsplash.com/photos/XY9tbPYhR34',
+    tabLabel: 'Night sky',
+    focalLength: '24mm',
+    aperture: 'ƒ/1.78',
+    iso: 'ISO 6400',
+    shutter: '10s Long Exposure',
+    location: 'Jasper Dark Sky Preserve, Alberta',
+    lens: '48MP Main Fusion • 2nd-gen Sensor-shift OIS',
+  },
+  {
+    id: 'city',
+    index: 1,
+    image: '/assets/images/gallery/gallery-city.jpg',
+    alt: 'City lights across a misty mountain waterfront at blue hour',
+    kicker: '02 / THE BLUE HOUR',
+    title: 'Blue Hour Waterfront Architecture',
+    credit: 'Saad Chaudhry',
+    url: 'https://unsplash.com/photos/G25LeMV7fAw',
+    tabLabel: 'Blue hour',
+    focalLength: '120mm',
+    aperture: 'ƒ/2.8',
+    iso: 'ISO 400',
+    shutter: '1/120s Handheld',
+    location: 'Vancouver Harbour, British Columbia',
+    lens: '48MP Tetraprism Periscope • 5x Optical Zoom',
+  },
+  {
+    id: 'landscape',
+    index: 2,
+    image: '/assets/images/gallery/gallery-landscape.jpg',
+    alt: 'Warm evening light over a lake and mountains',
+    kicker: '03 / OPEN HORIZONS',
+    title: 'Wide Horizon Landscape Optics',
+    credit: 'Jakob Rosen',
+    url: 'https://unsplash.com/photos/Ohzg_QsDpIo',
+    tabLabel: 'Open horizons',
+    focalLength: '13mm',
+    aperture: 'ƒ/2.2',
+    iso: 'ISO 100',
+    shutter: '1/500s Dynamic Range',
+    location: 'Lake Hallstatt, Upper Austria',
+    lens: '48MP Ultra Wide • 120° Field of View',
+  },
+];
+
+export const scenes = galleryScenes;
+
+export const galleryPhotos: GalleryPhoto[] = galleryScenes.map((s) => ({
+  id: s.id,
+  index: s.index,
+  kicker: s.kicker,
+  title: s.title,
+  location: s.location || '',
+  lens: s.lens || '',
+  image: s.image,
+  credit: {
+    photographer: s.credit,
+    source: 'Unsplash',
+    url: s.url,
+  },
+}));

@@ -1,0 +1,234 @@
+/* Magic UI & Shadcn Design System Tokens and Components */
+
+:root {
+  /* Shadcn Dark Theme (Obsidian / Azure) */
+  --shadcn-bg: #08090d;
+  --shadcn-card: rgba(14, 18, 26, 0.75);
+  --shadcn-card-border: rgba(255, 255, 255, 0.09);
+  --shadcn-card-hover: rgba(255, 255, 255, 0.16);
+  --shadcn-primary: #f8fafc;
+  --shadcn-primary-foreground: #08090d;
+  --shadcn-muted-foreground: #94a3b8;
+  --shadcn-accent: #38bdf8;
+  --shadcn-accent-glow: rgba(56, 189, 248, 0.25);
+}
+
+/* ---------------------------------------------------------------- Dot & Grid Backgrounds */
+.dot-pattern {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.12) 1px, transparent 1px);
+  background-size: 24px 24px;
+  -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, #000 40%, transparent 100%);
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, #000 40%, transparent 100%);
+  z-index: 0;
+  opacity: 0.8;
+}
+
+.grid-pattern {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 48px 48px;
+  -webkit-mask-image: radial-gradient(circle at center, #000 30%, transparent 80%);
+  mask-image: radial-gradient(circle at center, #000 30%, transparent 80%);
+  z-index: 0;
+}
+
+/* ---------------------------------------------------------------- Magic UI Border Beam */
+.border-beam-card {
+  position: relative;
+  border-radius: 20px;
+  background: var(--shadcn-card);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--shadcn-card-border);
+  overflow: hidden;
+}
+
+.border-beam-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    transparent 0%,
+    rgba(56, 189, 248, 0.45) 50%,
+    transparent 100%
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  animation: border-beam-sweep 6s ease-in-out infinite alternate;
+}
+
+@keyframes border-beam-sweep {
+  0% {
+    background-position: 0% 0%;
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.85;
+  }
+  100% {
+    background-position: 100% 100%;
+    opacity: 0.3;
+  }
+}
+
+/* ---------------------------------------------------------------- Magic UI Shimmer Button */
+.shimmer-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 0 26px;
+  height: 44px;
+  min-height: 44px;
+  border-radius: 9999px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #f8fafc;
+  background: radial-gradient(
+    100% 100% at 50% 0%,
+    rgba(56, 189, 248, 0.2) 0%,
+    rgba(14, 18, 26, 0.95) 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: 0 0 24px -4px rgba(56, 189, 248, 0.25);
+  overflow: hidden;
+  cursor: pointer;
+  transition:
+    transform 150ms ease,
+    box-shadow 150ms ease,
+    border-color 150ms ease;
+  box-sizing: border-box;
+}
+
+.shimmer-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.25) 50%,
+    transparent 100%
+  );
+  animation: shimmer-sweep 3.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  pointer-events: none;
+}
+
+.shimmer-btn:hover {
+  transform: translateY(-1px);
+  border-color: rgba(56, 189, 248, 0.5);
+  box-shadow: 0 0 30px -2px rgba(56, 189, 248, 0.4);
+}
+
+@keyframes shimmer-sweep {
+  0% {
+    left: -100%;
+  }
+  40%,
+  100% {
+    left: 100%;
+  }
+}
+
+/* ---------------------------------------------------------------- Shadcn Pill Badge */
+.shadcn-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #d4d4d8;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  backdrop-filter: blur(8px);
+}
+
+.shadcn-badge .badge-glow-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--shadcn-accent);
+  box-shadow: 0 0 8px var(--shadcn-accent);
+}
+
+/* ---------------------------------------------------------------- Magic UI Meteors */
+.meteors-container {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.meteor {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  height: 1.5px;
+  width: 80px;
+  background-image: linear-gradient(to right, rgba(56, 189, 248, 0.8), transparent);
+  border-radius: 9999px;
+  transform: rotate(-45deg);
+  animation: meteor-fall 8s linear infinite;
+  opacity: 0.4;
+}
+
+.meteor:nth-child(1) {
+  top: -20px;
+  left: 70%;
+  animation-delay: 0s;
+  width: 120px;
+}
+.meteor:nth-child(2) {
+  top: 20%;
+  left: 90%;
+  animation-delay: 2.2s;
+  width: 90px;
+}
+.meteor:nth-child(3) {
+  top: 40%;
+  left: 80%;
+  animation-delay: 4.5s;
+  width: 100px;
+}
+
+@keyframes meteor-fall {
+  0% {
+    transform: rotate(-45deg) translateX(0);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: rotate(-45deg) translateX(-600px);
+    opacity: 0;
+  }
+}

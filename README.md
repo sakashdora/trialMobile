@@ -1,21 +1,21 @@
-# AZURE mobile showcase
+# AZURE — approved design implementation
 
-A responsive, frontend-only premium brand and shopping concept. Run `npm run dev` and open http://127.0.0.1:4173. Run `npm run check` for JavaScript syntax validation. The deployable static website is in `dist/`.
+React + TypeScript + Vite. `npm ci`, `npm run dev` (http://127.0.0.1:4173), `npm run build`.
 
-The page includes three distinct concept phones, a photographic inspiration gallery with full-size viewing, product design and performance stories, four filterable accessory concepts, configurable phone storage, a dynamic two-phone comparison, a browser-local preview bag, FAQs, and native accessible dialogs. The mobile phone shelf supports horizontal swiping. Reduced-motion preferences are respected. Videos are intentionally deferred.
+The active interface is `src/App.tsx`, visual styles are `src/premium.css`, and the ten phones plus
+four accessories are defined in `src/data/collection.ts`. Product details, phone filters, comparison,
+and browser-local saved selections are implemented. The previous shortlist key is preserved.
 
-`dist/storefront.css` is the active stylesheet. `dist/app.js` contains the concept catalog, comparison, gallery, filters and preview bag behavior. The older stylesheets are retained but are no longer loaded.
+The design follows the approved navy-and-ivory mockup: an image-led hero, five-column phone grid
+(two columns on phones), scroll-linked text and camera detail, four accessories, comparison and closing band.
+Native scrolling is retained; one requestAnimationFrame updates the story, and reduced-motion preferences
+show the final text without transforms. Product images load lazily below the hero.
 
-Products, specifications and prices are illustrative and identified as concepts. The collection includes One Pro, One Air, One, a charger/cable Power Kit, Buds, a charging Stand and a Soft Case. Final charging standards, device compatibility, case fit and market-specific plug types are not verified. No payments, orders, accounts, analytics or subscriptions are connected. The preview bag uses localStorage when available and remains usable in memory when storage is unavailable.
+Concept imagery was generated specifically for the approved design. It is disclosed as concept artwork;
+no real specifications, compatibility, inventory or checkout are claimed. See `docs/approved-design-assets.md`.
 
-## Image sources
+Focused tests: `node --test --test-concurrency=1 tests/unit/concept-collection.test.mjs tests/unit/bag-resilience.test.mjs`.
+Older tests cover a legacy implementation and are not the active storefront suite.
 
-The One Pro hero is derived from the user-provided AZURE image. Other product images are generated AZURE concept artwork, encoded as optimized JPEGs for delivery; the transparent hero remains PNG.
-
-The gallery uses downloaded Unsplash photography, with visible credit links. These photographs are visual inspiration and are explicitly not presented as images captured on an AZURE device:
-
-- Priscilla Du Preez — https://unsplash.com/photos/XY9tbPYhR34
-- Saad Chaudhry — https://unsplash.com/photos/G25LeMV7fAw
-- Jakob Rosen — https://unsplash.com/photos/Ohzg_QsDpIo
-
-Before enabling real commerce, replace the illustrative catalog and pricing with approved product data, confirm availability, compatibility, shipping, returns and warranty, and implement payment and order-management integrations.
+The existing private Site identity is preserved in `.openai/hosting.json`. The previous redesign report
+in `docs/redesign-verification.md` describes the superseded six-phone version, not this approved design.

@@ -1,1 +1,40 @@
-{"name":"azure-mobile-showcase","version":"1.0.0","private":true,"scripts":{"dev":"node server.mjs","check":"node --check dist/app.js"}}
+{
+  "name": "azure-mobile-showcase",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "description": "AZURE phone concept collection with native scroll typography and a saved shortlist.",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview --port 4173",
+    "test": "node --test",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "gsap": "^3.15.1",
+    "@gsap/react": "^2.1.2",
+    "framer-motion": "^11.11.11",
+    "lucide-react": "^0.454.0",
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^2.5.4"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@types/node": "^22.8.7",
+    "@vitejs/plugin-react": "^4.3.3",
+    "vite": "^5.4.10",
+    "typescript": "^5.6.3",
+    "tailwindcss": "^3.4.14",
+    "postcss": "^8.4.47",
+    "autoprefixer": "^10.4.20",
+    "prettier": "3.6.2"
+  }
+}
