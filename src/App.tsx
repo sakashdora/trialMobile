@@ -1,33 +1,23 @@
 import { useEffect, useRef, useState } from 'react';
-import { ArrowUpRight, ArrowDown, Plus, Check, X, Menu, Bookmark, Trash2 } from 'lucide-react';
+import { ArrowUpRight, ArrowDown, Plus, Check, X, Menu, Bookmark, Trash2, Shield, Cpu, Sparkles } from 'lucide-react';
 import { BagProvider, useBag } from './context/BagContext';
 import { models, accessories, catalog, type Concept } from './data/collection';
 import './premium.css';
 
 function ProductImage({ item, eager = false }: { item: Concept; eager?: boolean }) {
-  const cols = item.category === 'phone' ? 5 : 2;
-  const column = item.tile % cols,
-    row = Math.floor(item.tile / cols);
-  // The contact sheet's open Fold extends slightly into the Edge cell.
-  const zoom = item.id === 'edge' ? 1.12 : 1;
-  const inset = (zoom - 1) * 50;
   return (
     <div className={`product-image ${item.category}`}>
       <img
-        src={`/assets/collection-v3/${item.category === 'phone' ? 'phones' : 'accessories'}.png`}
-        alt={`${item.name} in ${item.finish}, concept rendering`}
+        src={`/assets/collection-v3/items/${item.id}.png`}
+        alt={`${item.name} in ${item.finish}, titanium and ceramic concept design`}
         loading={eager ? 'eager' : 'lazy'}
         decoding="async"
-        style={{
-          width: `${cols * 100 * zoom}%`,
-          height: `${200 * zoom}%`,
-          left: `${-column * 100 * zoom - inset + (item.id === 'fold' ? 5 : 0)}%`,
-          top: `${-row * 100 * zoom - inset}%`,
-        }}
+        className="product-tile-img"
       />
     </div>
   );
 }
+
 function Storefront() {
   const { items, addItem, removeItem, clearBag } = useBag();
   const [filter, setFilter] = useState('All phones');
@@ -36,11 +26,11 @@ function Storefront() {
   const [bagOpen, setBagOpen] = useState(false);
   const [comparison, setComparison] = useState(['pro', 'air']);
   const dialog = useRef<HTMLDialogElement>(null);
-  const story = useRef<HTMLElement>(null);
   const saved = items.filter((item) => catalog.some((product) => product.id === item.model));
   const isSaved = (id: string) => saved.some((item) => item.model === id);
+
   const save = (item: Concept) => {
-    if (!isSaved(item.id))
+    if (!isSaved(item.id)) {
       addItem({
         model: item.id,
         name: `AZURE ${item.name}`,
@@ -49,11 +39,14 @@ function Storefront() {
         finish: item.finish,
         storage: 'Concept',
       });
+    }
   };
+
   const closeDialog = () => {
     setSelected(null);
     setBagOpen(false);
   };
+
   useEffect(() => {
     if (selected || bagOpen) dialog.current?.showModal();
     else dialog.current?.close();
@@ -65,6 +58,7 @@ function Storefront() {
       };
     }
   }, [selected, bagOpen, menu]);
+
   useEffect(() => {
     const surfaces = document.querySelectorAll<HTMLElement>('main,footer');
     surfaces.forEach((el) => {
@@ -81,44 +75,15 @@ function Storefront() {
       window.removeEventListener('keydown', escape);
     };
   }, [menu]);
-  useEffect(() => {
-    const section = story.current;
-    if (!section) return;
-    const preference = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const words = section.querySelectorAll<HTMLElement>('.story-word');
-    let frame = 0;
-    const update = () => {
-      frame = 0;
-      const box = section.getBoundingClientRect();
-      const p = preference.matches
-        ? 1
-        : Math.max(0, Math.min(1, (window.innerHeight * 0.75 - box.top) / (box.height * 0.75)));
-      section.style.setProperty('--progress', String(p));
-      words.forEach((word, i) =>
-        word.classList.toggle('lit', preference.matches || p > i / words.length),
-      );
-    };
-    const schedule = () => {
-      if (!frame) frame = requestAnimationFrame(update);
-    };
-    window.addEventListener('scroll', schedule, { passive: true });
-    window.addEventListener('resize', schedule);
-    preference.addEventListener('change', schedule);
-    update();
-    return () => {
-      window.removeEventListener('scroll', schedule);
-      window.removeEventListener('resize', schedule);
-      preference.removeEventListener('change', schedule);
-      cancelAnimationFrame(frame);
-    };
-  }, []);
+
   const visible = models.filter((item) => filter === 'All phones' || item.kind === filter);
   const nav = [
-    ['Phones', '#collection'],
-    ['Cases', '#cases'],
-    ['Charging', '#charging'],
+    ['Smartphones', '#collection'],
+    ['Architecture', '#architecture'],
     ['Accessories', '#accessories'],
+    ['Comparison', '#compare'],
   ];
+
   const card = (item: Concept) => (
     <article
       className={item.category === 'phone' ? 'phone-card' : 'accessory-card'}
@@ -128,7 +93,7 @@ function Storefront() {
       <button
         className="product-visual-button"
         onClick={() => setSelected(item)}
-        aria-label={`View ${item.name}`}
+        aria-label={`Inspect ${item.name} ${item.category}`}
       >
         <ProductImage item={item} />
       </button>
@@ -136,9 +101,12 @@ function Storefront() {
         <button className="product-name" onClick={() => setSelected(item)}>
           <h3>{item.name}</h3>
         </button>
+        <div className="product-spec-pill">
+          <span>{item.focus}</span>
+        </div>
         <div className="product-bottom">
           <span className="finish">
-            <i style={{ background: item.color }} />
+            <i style={{ background: item.color }} aria-hidden="true" />
             {item.finish}
           </span>
           <button
@@ -153,43 +121,56 @@ function Storefront() {
       </div>
     </article>
   );
+
   return (
     <div className="premium-site">
       <a className="skip-link" href="#content">
         Skip to content
       </a>
+
+      {/* Header Navigation */}
       <header className="site-header">
-        <a className="brand" href="#home" aria-label="AZURE home">
-          AZURE
-        </a>
-        <nav className="desktop-nav" aria-label="Main navigation">
-          {nav.map(([label, url]) => (
-            <a key={url} href={url}>
-              {label}
+        <div className="header-inner wrap">
+          <a className="brand" href="#home" aria-label="AZURE Smartphones home">
+            <svg viewBox="0 0 40 36" aria-hidden="true" className="brand-glyph">
+              <path d="M17 1h8L40 34H29L17 9 5 34H0L17 1Z" />
+              <path d="m17 23 5 11H11Z" />
+            </svg>
+            <span>AZURE</span>
+          </a>
+          <nav className="desktop-nav" aria-label="Main navigation">
+            {nav.map(([label, url]) => (
+              <a key={url} href={url}>
+                {label}
+              </a>
+            ))}
+          </nav>
+          <div className="nav-actions">
+            <button
+              className="saved-button"
+              onClick={() => setBagOpen(true)}
+              aria-label={`Open saved collection, ${saved.length} items`}
+            >
+              <Bookmark size={16} />
+              <span>Shortlist</span>
+              <b>{saved.length.toString().padStart(2, '0')}</b>
+            </button>
+            <a href="#collection" className="btn primary nav-cta">
+              Explore 10 Handsets
             </a>
-          ))}
-        </nav>
-        <div className="nav-actions">
-          <button
-            className="saved-button"
-            onClick={() => setBagOpen(true)}
-            aria-label={`Open saved collection, ${saved.length} items`}
-          >
-            <Bookmark size={17} />
-            <span>Saved</span>
-            <b>{saved.length.toString().padStart(2, '0')}</b>
-          </button>
-          <button
-            className="menu-button"
-            aria-label={menu ? 'Close menu' : 'Open menu'}
-            aria-expanded={menu}
-            aria-controls="mobile-navigation"
-            onClick={() => setMenu(!menu)}
-          >
-            {menu ? <X /> : <Menu />}
-          </button>
+            <button
+              className="menu-button"
+              aria-label={menu ? 'Close menu' : 'Open menu'}
+              aria-expanded={menu}
+              aria-controls="mobile-navigation"
+              onClick={() => setMenu(!menu)}
+            >
+              {menu ? <X /> : <Menu />}
+            </button>
+          </div>
         </div>
       </header>
+
       {menu && (
         <nav id="mobile-navigation" className="mobile-navigation" aria-label="Mobile navigation">
           {nav.map(([label, url]) => (
@@ -200,42 +181,68 @@ function Storefront() {
           ))}
         </nav>
       )}
+
       <main id="content">
+        {/* Section 1: Hero Section */}
         <section className="hero" id="home">
           <img
             className="hero-image"
             src="/assets/collection-v3/hero.png"
-            alt="Three AZURE concept phones in titanium, ivory and midnight on dark slate"
+            alt="AZURE One Pro flagship smartphones in Grade-5 Titanium, Ivory and Midnight on dark slate table"
+            fetchPriority="high"
           />
           <div className="hero-shade" />
           <div className="hero-content wrap">
-            <p className="eyebrow hero-enter">The AZURE concept collection</p>
+            <div className="hero-badge">
+              <span className="badge-dot" /> 10 FLAGSHIP SMARTPHONE CONCEPTS · 2026 EDITION
+            </div>
             <h1>
-              <span>A phone for</span>
-              <span>every side</span>
-              <span>of you.</span>
+              <span>AZURE Flagship</span>
+              <span>Smartphones</span>
+              <span>Built in Titanium.</span>
             </h1>
-            <p className="hero-intro hero-enter">Ten phones. A world of possibilities.</p>
-            <a className="btn light hero-enter" href="#collection">
-              View the collection <ArrowUpRight size={17} />
-            </a>
-            <a className="scroll-hint" href="#collection">
-              Scroll to discover <ArrowDown size={15} />
-            </a>
+            <p className="hero-intro">
+              Grade-5 titanium unibody, 200MP periscope telephoto optics, and sub-3nm neural silicon. 
+              Engineered with zero compromise for pure performance and ergonomics.
+            </p>
+            <div className="hero-actions">
+              <a className="btn light" href="#collection">
+                Explore The 10 Smartphones <ArrowUpRight size={17} />
+              </a>
+              <a className="btn secondary hero-ghost" href="#architecture">
+                Titanium Engineering <ArrowDown size={15} />
+              </a>
+            </div>
+            <div className="hero-stats-strip">
+              <div>
+                <strong>Grade-5</strong>
+                <small>Solid Titanium</small>
+              </div>
+              <div>
+                <strong>3nm Core</strong>
+                <small>Neural Compute Engine</small>
+              </div>
+              <div>
+                <strong>2,000 Nits</strong>
+                <small>120Hz ProMotion LTPO</small>
+              </div>
+            </div>
           </div>
         </section>
+
+        {/* Section 2: Collection Catalog */}
         <section id="collection" className="collection-section">
           <div className="wrap">
             <div className="section-heading">
               <div>
-                <p className="eyebrow">01 / Find your One</p>
+                <p className="eyebrow">01 / The Handset Lineup</p>
                 <h2>
-                  Ten phones.
-                  <br className="mobile-break" /> Find your One.
+                  Ten distinct smartphones.
+                  <br className="mobile-break" /> One pure engineering ethos.
                 </h2>
               </div>
               <a href="#compare" className="text-link">
-                Compare models <ArrowUpRight size={16} />
+                Compare technical specifications <ArrowUpRight size={16} />
               </a>
             </div>
             <div className="filter-row" aria-label="Filter phones">
@@ -249,74 +256,105 @@ function Storefront() {
                   {value === 'All phones' && <small>10</small>}
                 </button>
               ))}
-              <span aria-live="polite">{visible.length} concepts</span>
+              <span aria-live="polite" className="filter-count">{visible.length} available</span>
             </div>
             <div className="phone-grid">{visible.map(card)}</div>
             <p className="collection-note">
-              The complete concept collection. Choose a phone to see its design direction.
+              Every handset concept represents a calibrated balance of ergonomics, thermal dissipation, and optical glass; no order or payment is taken.
             </p>
           </div>
         </section>
-        <section
-          className="story-section"
-          id="design"
-          ref={story}
-          aria-label="Designed to move with you"
-        >
-          <div className="story-sticky">
-            <div className="story-art" aria-hidden="true" />
-            <div className="story-copy wrap">
-              <p className="eyebrow">02 / Form meets feeling</p>
-              <h2 aria-label="Designed to move with you.">
-                {['Designed', 'to', 'move', 'with', 'you.'].map((word, i) => (
-                  <span className="story-word" aria-hidden="true" key={i}>
-                    {word}{' '}
-                  </span>
-                ))}
-              </h2>
-              <p>
-                A shape that feels right.
-                <br />A finish that feels like you.
-              </p>
+
+        {/* Section 3: Titanium Architecture Section */}
+        <section className="architecture-section" id="architecture">
+          <div className="wrap">
+            <div className="section-heading">
+              <div>
+                <p className="eyebrow">02 / Precision Architecture</p>
+                <h2>Machined from solid Grade-5 titanium billets.</h2>
+              </div>
+              <p>Sub-millimeter tolerances. Laser-fused ceramic shield armor.</p>
             </div>
-            <span className="story-index" aria-hidden="true">
-              AZURE / IN DETAIL
-            </span>
+
+            <div className="architecture-grid">
+              <div className="arch-feature-visual">
+                <img
+                  src="/assets/collection-v3/detail.png"
+                  alt="Micro-engineered titanium periscope camera surround with dark sapphire crystal lenses"
+                  loading="lazy"
+                />
+                <span className="arch-visual-tag">PROVISION TETRAPRISM OPTICS</span>
+              </div>
+              <div className="arch-feature-copy">
+                <div className="arch-card">
+                  <div className="arch-card-icon"><Shield size={20} /></div>
+                  <h3 className="story-word">Precision Grade-5 Titanium Perimeter</h3>
+                  <p>
+                    Contoured 7.8mm featherweight titanium perimeter with integrated tactile action button. 
+                    Solid-state diffusion bonded to an internal graphene thermal skeleton.
+                  </p>
+                </div>
+                <div className="arch-card">
+                  <div className="arch-card-icon"><Cpu size={20} /></div>
+                  <h3>TSMC 3nm Neural Silicon Core</h3>
+                  <p>
+                    18.6 billion transistors engineered for sustained compute density and zero throttling. 
+                    Features dedicated on-device machine intelligence.
+                  </p>
+                </div>
+                <div className="arch-card">
+                  <div className="arch-card-icon"><Sparkles size={20} /></div>
+                  <h3>Ceramic Shield Nanocrystal Armor</h3>
+                  <p>
+                    Dual-ion exchange glass backplate micro-etched for a silky fingerprint-resistant tactile finish 
+                    and 4x greater drop resilience.
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
+
+        {/* Section 4: Ecosystem & Accessories */}
         <section className="accessories-section" id="accessories">
           <div className="wrap">
             <div className="section-heading">
               <div>
-                <p className="eyebrow">03 / Complete your everyday</p>
-                <h2>The finishing touches.</h2>
+                <p className="eyebrow">03 / The Ecosystem</p>
+                <h2>Modular charging and acoustic accessories.</h2>
               </div>
-              <p>From your pocket to your desk.</p>
+              <p>Universal USB-C Power Delivery and magnetic wireless alignment.</p>
             </div>
             <div className="accessory-grid">{accessories.map(card)}</div>
           </div>
         </section>
+
+        {/* Section 5: Handset Comparison */}
         <section className="compare-section" id="compare">
           <div className="wrap">
             <div className="section-heading">
               <div>
-                <p className="eyebrow">04 / Side by side</p>
-                <h2>Which One is yours?</h2>
+                <p className="eyebrow">04 / Side by Side Inspector</p>
+                <h2>Compare specifications and dimensions.</h2>
               </div>
-              <p>Compare the design directions.</p>
+              <p>Select any two handsets to inspect optics, compute, and materials.</p>
             </div>
             <div className="comparison">
               <div className="compare-labels">
-                <span>Choose a phone</span>
-                <span>Focus</span>
-                <span>Format</span>
-                <span>Finish</span>
+                <span className="compare-thumb-label">Device Preview</span>
+                <span>Select Handset</span>
+                <span>Hardware Focus</span>
+                <span>Display &amp; Chassis</span>
+                <span>Finish &amp; Materials</span>
               </div>
               {comparison.map((id, index) => {
                 const item = models.find((m) => m.id === id)!;
                 return (
                   <div className="compare-column" key={index}>
-                    <label htmlFor={`compare-${index}`}>Phone {index + 1}</label>
+                    <div className="compare-thumb">
+                      <ProductImage item={item} />
+                    </div>
+                    <label htmlFor={`compare-${index}`}>Handset {index + 1}</label>
                     <select
                       id={`compare-${index}`}
                       value={id}
@@ -328,18 +366,18 @@ function Storefront() {
                     >
                       {models.map((model) => (
                         <option value={model.id} key={model.id}>
-                          {model.name}
+                          {model.name} ({model.finish})
                         </option>
                       ))}
                     </select>
-                    <span>{item.focus}</span>
-                    <span>{item.size}</span>
-                    <span>
-                      <i style={{ background: item.color }} />
-                      {item.finish}
+                    <span className="compare-val">{item.focus}</span>
+                    <span className="compare-val">{item.size}</span>
+                    <span className="compare-val">
+                      <i style={{ background: item.color }} aria-hidden="true" />
+                      {item.finish} ({item.material})
                     </span>
                     <button className="btn secondary" onClick={() => save(item)}>
-                      {isSaved(id) ? 'Saved' : `Save ${item.name}`}
+                      {isSaved(id) ? 'Shortlisted' : `Shortlist ${item.name}`}
                       {isSaved(id) ? <Check size={15} /> : <Plus size={15} />}
                     </button>
                   </div>
@@ -348,29 +386,40 @@ function Storefront() {
             </div>
           </div>
         </section>
+
+        {/* Section 6: Closing Section */}
         <section className="closing-section">
           <div className="wrap">
-            <h2>Your phone. Your way.</h2>
-            <button className="btn light" onClick={() => setBagOpen(true)}>
-              View your collection <ArrowUpRight size={17} />
-            </button>
+            <div className="closing-content">
+              <p className="eyebrow">AZURE FLAGSHIP SHOWCASE</p>
+              <h2>Experience the pinnacle of mobile design.</h2>
+              <p>Curate your personal collection and review your shortlisted devices.</p>
+              <button className="btn light" onClick={() => setBagOpen(true)}>
+                View your shortlist ({saved.length}) <ArrowUpRight size={17} />
+              </button>
+            </div>
           </div>
         </section>
       </main>
+
       <footer className="site-footer">
-        <div className="footer-top">
-          <a className="brand" href="#home">
-            AZURE
-          </a>
-          <a className="text-link" href="#home">
-            Back to top ↑
-          </a>
+        <div className="wrap footer-wrap">
+          <div className="footer-top">
+            <a className="brand" href="#home">
+              AZURE
+            </a>
+            <a className="text-link" href="#home">
+              Back to top ↑
+            </a>
+          </div>
+          <p>
+            AZURE Technology Inc. Flagship smartphone concept showcase. 
+            All device configurations, materials, and renders are illustrative design studies.
+          </p>
         </div>
-        <p>
-          AZURE is a concept collection. Images are concept renders. Specifications, pricing and
-          compatibility are not confirmed. No purchases are processed.
-        </p>
       </footer>
+
+      {/* Inspector / Shortlist Dialog */}
       <dialog
         ref={dialog}
         className="concept-dialog"
@@ -391,7 +440,7 @@ function Storefront() {
           {selected ? (
             <>
               <p className="eyebrow">
-                AZURE / {selected.category === 'phone' ? 'Phone' : 'Accessory'} concept
+                AZURE / {selected.category === 'phone' ? 'Smartphone' : 'Accessory'} Architecture
               </p>
               <div className="dialog-product-image">
                 <ProductImage item={selected} eager />
@@ -400,30 +449,31 @@ function Storefront() {
               <p>{selected.description}</p>
               <dl>
                 <div>
-                  <dt>Focus</dt>
+                  <dt>Target Focus</dt>
                   <dd>{selected.focus}</dd>
                 </div>
                 <div>
-                  <dt>Format</dt>
+                  <dt>Chassis Format</dt>
                   <dd>{selected.size}</dd>
                 </div>
                 <div>
-                  <dt>Finish</dt>
+                  <dt>Exterior Finish</dt>
                   <dd>{selected.finish}</dd>
                 </div>
+                <div>
+                  <dt>Structural Material</dt>
+                  <dd>{selected.material}</dd>
+                </div>
               </dl>
-              <button className="btn primary" onClick={() => save(selected)}>
-                {isSaved(selected.id) ? 'Saved to your collection' : `Save ${selected.name}`}
+              <button className="btn primary dialog-cta" onClick={() => save(selected)}>
+                {isSaved(selected.id) ? 'Shortlisted in your collection' : `Add ${selected.name} to shortlist`}
                 {isSaved(selected.id) ? <Check size={17} /> : <Plus size={17} />}
               </button>
-              <p className="dialog-note">
-                Concept only. Final specifications, pricing and compatibility are not confirmed.
-              </p>
             </>
           ) : (
             <>
-              <p className="eyebrow">Your collection</p>
-              <h2>Saved items ({saved.length})</h2>
+              <p className="eyebrow">Curated Shortlist</p>
+              <h2>Saved Devices &amp; Gear ({saved.length})</h2>
               {saved.length ? (
                 <>
                   <div className="saved-list">
@@ -436,7 +486,7 @@ function Storefront() {
                           </div>
                           <div>
                             <h3>{product.name}</h3>
-                            <p>{item.finish} / Concept</p>
+                            <p>{item.finish} / {product.material}</p>
                           </div>
                           <button
                             className="icon-button"
@@ -450,19 +500,18 @@ function Storefront() {
                     })}
                   </div>
                   <button className="text-link" onClick={clearBag}>
-                    Clear collection
+                    Clear shortlist
                   </button>
                 </>
               ) : (
                 <div className="empty-state">
                   <Bookmark size={30} />
-                  <p>Save a phone or accessory that catches your eye.</p>
+                  <p>Select any smartphone or accessory to shortlist your favorite concepts.</p>
                   <a className="btn primary" href="#collection" onClick={closeDialog}>
-                    View the collection <ArrowUpRight size={17} />
+                    View the smartphones <ArrowUpRight size={17} />
                   </a>
                 </div>
               )}
-              <p className="dialog-note">Saved on this browser; no order or payment is taken.</p>
             </>
           )}
         </div>
@@ -470,9 +519,11 @@ function Storefront() {
     </div>
   );
 }
+
 export const App = () => (
   <BagProvider storageKey="azure-concept-shortlist">
     <Storefront />
   </BagProvider>
 );
+
 export default App;
